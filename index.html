@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoroVer Band — Smart Driver Safety System</title>
+  <meta name="description" content="CoroVer Smart Driver Safety Band — Real-time driver behavior monitoring with haptic feedback and gamified leaderboard.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ═══ Header ═══ -->
+  <header class="header" id="header">
+    <div class="header-left">
+      <div class="logo-mark">
+        <span class="logo-icon">⚡</span>
+        <div>
+          <h1 class="logo-text">CoroVer<span class="logo-accent">Band</span></h1>
+          <p class="logo-sub">Smart Driver Safety System</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="ble-status" id="bleStatus">
+        <span class="ble-dot" id="bleDot"></span>
+        <span class="ble-label" id="bleLabel">Disconnected</span>
+      </div>
+      <button class="btn-ble" id="btnConnect" title="Connect via Bluetooth">
+        <span>🔗</span> Connect BLE
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ Main Dashboard ═══ -->
+  <main class="dashboard">
+
+    <!-- ─── Row 1: Controls + Live Status ─── -->
+    <div class="row-top">
+
+      <!-- Control Panel -->
+      <section class="card control-card" id="controlPanel">
+        <div class="card-header">
+          <h2>🎮 Vehicle Controls</h2>
+        </div>
+        <div class="card-body">
+          <!-- Ignition -->
+          <div class="ignition-wrap">
+            <button class="ignition-btn" id="btnIgnition" aria-label="Toggle Ignition">
+              <span class="ign-icon">🔑</span>
+              <span class="ign-label" id="ignLabel">Ignition OFF</span>
+            </button>
+            <p class="ign-hint">Tap to toggle engine state</p>
+          </div>
+          <!-- Triggers -->
+          <div class="trigger-grid">
+            <button class="trigger-btn t-idle" id="btnIdling" disabled>
+              <span class="t-icon">⏳</span>
+              <span class="t-name">Idling</span>
+              <span class="t-status" id="idleStatus">Inactive</span>
+            </button>
+            <button class="trigger-btn t-speed" id="btnSpeeding" disabled>
+              <span class="t-icon">🏎️</span>
+              <span class="t-name">Speeding</span>
+              <span class="t-status" id="speedStatus">Clear</span>
+            </button>
+            <button class="trigger-btn t-brake" id="btnHarshBrake" disabled>
+              <span class="t-icon">🛑</span>
+              <span class="t-name">Harsh Brake</span>
+              <span class="t-status">Trigger</span>
+            </button>
+            <button class="trigger-btn t-levelup" id="btnLevelUp" disabled>
+              <span class="t-icon">🏆</span>
+              <span class="t-name">Level Up!</span>
+              <span class="t-status">Reward</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Status Panel -->
+      <section class="card status-card" id="statusPanel">
+        <div class="card-header">
+          <h2>📡 Live Status</h2>
+          <span class="live-badge" id="liveBadge">● OFFLINE</span>
+        </div>
+        <div class="card-body">
+          <div class="status-grid">
+            <div class="s-item" id="sIgnition">
+              <div class="s-icon-wrap s-off"><span>🔑</span></div>
+              <div class="s-info">
+                <span class="s-label">Ignition</span>
+                <span class="s-value" id="sIgnVal">OFF</span>
+              </div>
+            </div>
+            <div class="s-item" id="sLed">
+              <div class="s-icon-wrap s-off"><span>💡</span></div>
+              <div class="s-info">
+                <span class="s-label">LED Status</span>
+                <span class="s-value" id="sLedVal">OFF</span>
+              </div>
+            </div>
+            <div class="s-item" id="sIdling">
+              <div class="s-icon-wrap s-off"><span>📳</span></div>
+              <div class="s-info">
+                <span class="s-label">Vibration (Idling)</span>
+                <span class="s-value" id="sIdleVal">Inactive</span>
+              </div>
+            </div>
+            <div class="s-item" id="sSpeeding">
+              <div class="s-icon-wrap s-off"><span>🔔</span></div>
+              <div class="s-info">
+                <span class="s-label">Buzzer (Speeding)</span>
+                <span class="s-value" id="sSpeedVal">Clear</span>
+              </div>
+            </div>
+            <div class="s-item" id="sBrake">
+              <div class="s-icon-wrap s-off"><span>⚠️</span></div>
+              <div class="s-info">
+                <span class="s-label">Harsh Braking</span>
+                <span class="s-value" id="sBrakeVal">Clear</span>
+              </div>
+            </div>
+            <div class="s-item" id="sAck">
+              <div class="s-icon-wrap s-off"><span>✅</span></div>
+              <div class="s-info">
+                <span class="s-label">Idle Acknowledged</span>
+                <span class="s-value" id="sAckVal">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ─── Row 2: Event Log ─── -->
+    <section class="card log-card" id="logPanel">
+      <div class="card-header">
+        <h2>📋 Event Log</h2>
+        <div class="log-actions">
+          <button class="btn-sm" id="btnExport" title="Export logs as JSON">📥 Export</button>
+          <button class="btn-sm" id="btnImport" title="Import logs from JSON">📤 Import</button>
+          <button class="btn-sm btn-danger" id="btnClearLogs" title="Clear all logs">🗑️ Clear</button>
+        </div>
+      </div>
+      <div class="log-body" id="logBody">
+        <div class="log-empty" id="logEmpty">
+          <span>📭</span>
+          <p>No events logged yet. Connect your CoroVer Band to get started.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Row 3: Leaderboard ─── -->
+    <section class="card lb-card" id="lbPanel">
+      <div class="card-header">
+        <h2>🏆 Driver Leaderboard</h2>
+        <span class="lb-season">Season 1 — 2026</span>
+      </div>
+      <!-- Stats Summary -->
+      <div class="lb-stats" id="lbStats">
+        <div class="lb-stat">
+          <span class="lb-stat-val" id="lbScore">0</span>
+          <span class="lb-stat-lbl">Safety Score</span>
+        </div>
+        <div class="lb-stat">
+          <span class="lb-stat-val" id="lbLevel">Rookie</span>
+          <span class="lb-stat-lbl">Current Level</span>
+        </div>
+        <div class="lb-stat">
+          <span class="lb-stat-val" id="lbKm">0</span>
+          <span class="lb-stat-lbl">KM Travelled</span>
+        </div>
+        <div class="lb-stat">
+          <span class="lb-stat-val" id="lbPenalties">0</span>
+          <span class="lb-stat-lbl">Total Penalties</span>
+        </div>
+        <div class="lb-stat">
+          <span class="lb-stat-val" id="lbDriveTime">0m</span>
+          <span class="lb-stat-lbl">Drive Time</span>
+        </div>
+        <div class="lb-stat">
+          <span class="lb-stat-val" id="lbSessions">0</span>
+          <span class="lb-stat-lbl">Sessions</span>
+        </div>
+      </div>
+      <!-- Level Progress -->
+      <div class="lb-progress-wrap">
+        <div class="lb-progress-info">
+          <span id="lbLevelCur">Rookie</span>
+          <span id="lbLevelNext">→ Beginner (100 pts)</span>
+        </div>
+        <div class="lb-progress-bar">
+          <div class="lb-progress-fill" id="lbProgressFill" style="width:0%"></div>
+        </div>
+      </div>
+      <!-- Table -->
+      <div class="lb-table-wrap">
+        <table class="lb-table" id="lbTable">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Driver</th>
+              <th>Level</th>
+              <th>Score</th>
+              <th>KM</th>
+              <th>Penalties</th>
+              <th>Trend</th>
+            </tr>
+          </thead>
+          <tbody id="lbTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Hidden file input for import -->
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+
+  <footer class="footer">
+    <p>CoroVer Band v1.0 — Smart Driver Safety Prototype &copy; 2026</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
